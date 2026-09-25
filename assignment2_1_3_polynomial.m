@@ -1,45 +1,65 @@
+clear all
+close all
+clc
+
+%%init
+
+a_zero_true = -2.923;
+b_zero_true = 7.18;
+c_zero_true = 2.8;
+mu = 0;
 sigma = 12.8;
-my = 0;
-N =100;
-e = normrnd(my, sigma, [N 1]);
 
-a0 = -2.923;
-b0 = 7.18;
-c0 = 2.8;
+N = 100;
+%x= sort(unifrnd(0, 50, [N 1])); %input
+x= sort(unifrnd(0, 50, [N 1])); %input
 
-lower_limit = 0;
-upper_limit = 50;
-sz = [N 1];
-x = lower_limit + (upper_limit-lower_limit)*rand(sz);
+y = zeros(N,1); %noice free
+yn= zeros(N,1); %noice incl
+e = normrnd(mu, sigma^2, [N 1]);
 
-% figure(1)
-% scatter(x,linspace(50,0.5))
-% grid on;
-
-y = zeros(N,1);
-for t = 1:N
-    y(t) = a0 +b0*x(t) + c0*x(t)^2 + e(t);
+for t = 1:N % zero initial condition
+    y(t) = a_zero_true + b_zero_true*x(t) + c_zero_true*x(t)^2;
+    yn(t) = y(t) + e(t);
 end
 
-figure(2)
-plot(x,y, '.');
-grid on; hold on;
+%%%%%%%%%%%%%%% Linear Line%%%%%%%%%%%%%%%%%%%%%%%%
+phi_lin = [ones(N,1) x] ;
+theta_hat_lin = phi_lin\yn;
+y_hat_lin = phi_lin * theta_hat_lin;
 
-%%%Time for linear regression aka want to fin parameters K and m in y = Kx
-%%%+ m 
-X = [ones(N,1), x, x.^2];
-theta_hat = X\y; %solves Ax = b
-y_hat = X * theta_hat;
+%%%%%%%%%%%%%%%%%%% Poly line %%%%%%%%%%%%%%%%%%%%%%%
+phi_poly = [ones(N,1) x x.^2] ;
+theta_hat_poly = phi_poly\yn;
+y_hat_poly = phi_poly * theta_hat_poly;
 
-%for plotting sort:
-[x_sorted, idx] = sort(x);
-y_hat_sorted = y_hat(idx);
+%%%%%%%%%%%%%%%%%%%%residuals%%%%%%%%%%%%%%%%%%%%%
 
-xlabel('x');
-ylabel('y');
-title('Second order polynomial Estimation')
-legend('data', 'estimate');
-plot(x_sorted, y_hat_sorted, '--');
+residuals_poly = 1/N *sum((yn-y_hat_poly).^2);
+residuals_lin = 1/N *sum((yn-y_hat_lin).^2);
+
+%%%%%%%%%%%%%%%%plot%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+figure(1); clf;
+plot(x, yn, '.');
+hold on;
+plot(x, y_hat_lin);
 hold off;
+legend('data', 'estimate')
+title('Linear Estimation')
+xlabel('x')
+ylabel('y')
 
-disp(theta_hat)
+figure(2); clf;
+plot(x, yn, '.');
+hold on;
+plot(x,y_hat_poly);
+hold off;
+legend('data', 'estimate poly')
+title('Second Order Polynomial Estimation')
+xlabel('x')
+ylabel('y')
+
+disp('Linear estimator''s residual is:');
+disp(residuals_lin);
+disp('Polynomial estimator''s residual is:');
+disp(residuals_poly);
