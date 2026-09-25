@@ -21,10 +21,17 @@ for t = 1:N % zero initial condition
     y(t) = a_zero_true + b_zero_true*x(t);
     yn(t) = y(t) + e(t);
 end
+phi = [ones(N,1) x] ;
+theta_hat = phi\yn;
+y_hat = phi * theta_hat;
 
 figure(1); clf;
-plot(x, yn, '.')
-title('')
+plot(x, yn, '.');
+hold on;
+plot(x, y_hat);
+hold off;
+legend('data', 'estimate')
+title('LS')
 xlabel('x')
 ylabel('y')
 
