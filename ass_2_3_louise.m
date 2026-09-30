@@ -39,9 +39,9 @@ end
 %Model a)
 theta_a = H_a\yest;
 
-a_1_a = theta_a(1);
-a_2_a = theta_a(2);
-b_0_a = theta_a(3);
+a1_a = theta_a(1);
+a2_a = theta_a(2);
+b0_a = theta_a(3);
 
 %model b)
 theta_b = H_b\yest;
@@ -67,21 +67,46 @@ disp("Model C")
 disp(theta_c)
 
 
+%%%%% PREDICTION PART %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+yn= yval;
+un = uval;
+val_len = ceil(length(u)*0.2);
+
+ypred_a = zeros(val_len, 1);
+ypred_a(1) = yn(1);
+ypred_a(2) = yn(2);
+ypred_b = zeros(val_len, 1);
+ypred_b(1) = yn(1);
+ypred_b(2) = yn(2);
+ypred_c = zeros(val_len, 1);
+ypred_c(1) = yn(1);
+ypred_c(2) = yn(2);
+ypred_c(2) = yn(3);
+
+for i=3:val_len
+    ypred_a(i) = -a1_a*yest(i-1) -a2_a*yest(i-2) + b0_a*uest(i);
+    ypred_b(i) = -a1_b*yest(t-1) -a2_b*yest(t-2) + b0_b*uest(t) + b1_b*uest(t-1);
+end
+
+for i=4:val_len
+    ypred_c(i) = -a1_c*yest(t-1) -a2_c*yest(t-2) -a3_c*yest(t-3) + b0_c*uest(t-1);
+end
+
+predERROR_a = yn - ypred_a;
+predERROR_b = yn - ypred_b;
+predERROR_c = yn - ypred_c;
+predRMSE_a = rms(predERROR_a);
+predRMSE_b = rms(predERROR_b);
+predRMSE_c = rms(predERROR_c);
 
 
+disp("Model A pred")
+disp(predRMSE_a)
+disp("Model B pred")
+disp(predRMSE_b)
+disp("Model C pred")
+disp(predRMSE_c)
 
-% yn= yval;
-% un = uval;
-% 
-% ypred = zeros(len_data_div, 1);
-% ypred(1) = yn(1);
-% 
-% for i=3:len_data_div
-%     ypred(i) = -a_1hat*yest(i-1) -a_2hat*yest(i-2) + b_0hat*uest(i);
-% end
-% 
-% predERROR = yn - ypred;
-% predRMSE = rms(predERROR);
 
 %%%simulation:
 
@@ -89,14 +114,36 @@ y_sim_a = zeros(length(yval),1);
 y_sim_a(1) = yval(1);
 y_sim_a(2) = yval(2);
 
+y_sim_b = zeros(length(yval),1);
+y_sim_b(1) = yval(1);
+y_sim_b(2) = yval(2);
+
+
 for i=3:length(yval)
-    y_sim_a(i) = b_0_a*uval(i) -a_1_a*y_sim_a(i-1) -a_2_a*y_sim_a(i-2);
+    y_sim_a(i) = b0_a*uval(i) -a1_a*y_sim_a(i-1) -a2_a*y_sim_a(i-2);
+    y_sim_b(i) = b0_b*uval(i) + b1_b*uval(i-1) -a1_b*y_sim_a(i-1) -a2_b*y_sim_a(i-2);
 end
 
-simERROR = yval-y_sim_a;
+y_sim_c = zeros(length(yval),1);
+y_sim_c(1) = yval(1);
+y_sim_c(2) = yval(2);
+y_sim_c(3) = yval(3);
+
+for i=4:length(yval)
+    y_sim_c(i) = b1_c*uval(i-1) -a1_c*y_sim_c(i-1) -a2_c*y_sim_c(i-2) -a3_c*y_sim_c(i-3);
+end
+
+%simmulation errors
+simERROR_a = yval-y_sim_a;
+simRMSE_a = rms(simERROR_a);
+
+simERROR_b = yval-y_sim_b;
+simRMSE_b = rms(simERROR_b);
+
+simERROR = yval-y_sim_c;
 simRMSE = rms(simERROR);
 
-% plot DATA vs MODEL prediction
+% plot DATA vs MODEL prediction a)
 figure(1); clf;
 subplot(2,1,1)
 plot(yval)
@@ -107,9 +154,46 @@ title('Output')
 xlabel('Samples')
 ylabel('output')
 subplot(2,1,2)
-plot(simERROR)
+plot(simERROR_a)
 legend('Prediction error')
 xlabel('Samples')
 ylabel('error')
  
+disp(['Simulation RMS error is: ' num2str(simRMSE_a)])
+
+
+% plot DATA vs MODEL prediction b)
+figure(2); clf;
+subplot(2,1,1)
+plot(yval)
+hold on
+plot(y_sim_b)
+legend('DATA','Model simulation')
+title('Output')
+xlabel('Samples')
+ylabel('output')
+subplot(2,1,2)
+plot(simERROR_b)
+legend('Simulation Prediction error')
+xlabel('Samples')
+ylabel('error')
+ 
+disp(['Simulation RMS error is: ' num2str(simRMSE_b)])
+
+% plot DATA vs MODEL prediction model c)
+figure(3); clf;
+subplot(2,1,1)
+plot(yval)
+hold on
+plot(y_sim_c)
+legend('DATA','Model simulation')
+title('Output')
+xlabel('Samples')
+ylabel('output')
+subplot(2,1,2)
+plot(simERROR)
+legend('Simulation prediction error')
+xlabel('Samples')
+ylabel('error')
+
 disp(['Simulation RMS error is: ' num2str(simRMSE)])
