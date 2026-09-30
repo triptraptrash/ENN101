@@ -1,7 +1,7 @@
 clc
 load("input.mat")
 load("output.mat")
-syms t
+syms a_1 a_2 b_0 const
 %80 validation 20% training
 split_u = floor(0.8*length(u));
 test_data_u = u(split_u+1:end, 1);
@@ -20,7 +20,23 @@ while c < 5
     y_groups(:, c+1) = train_row_y(c*len_group+1:(c+1)*len_group);
     c= c+1;
 end
+y_hat_est = zeros(len_group, 5);
+u_est = u_groups;
 
+for iter = 1:5
+    
+    for t = 3:len_group-2 % zero initial condition
+        phi = [-y(t-1, iter) -y(t-2, iter) u_groups(t, iter)].';
+        theta = [a_1 a_2 b_0];
+        y_hat_est(t) = theta*phi;
+    end
+   
+end
+
+%%% estimation part
+for iter = 1:5
+    H(iter, :)
+end
 %Let them find things, get the estimator
 
 %while iteration
