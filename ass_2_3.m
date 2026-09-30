@@ -39,9 +39,9 @@ end
 %Model a)
 theta_a = H_a\yest;
 
-a_1_a = theta_a(1);
-a_2_a = theta_a(2);
-b_0_a = theta_a(3);
+a1_a = theta_a(1);
+a2_a = theta_a(2);
+b0_a = theta_a(3);
 
 %model b)
 theta_b = H_b\yest;
@@ -56,8 +56,8 @@ theta_c = H_c\yest;
 
 a1_c = theta_c(1);
 a2_c = theta_c(2);
-b0_c = theta_c(3);
-b1_c = theta_c(4);
+a3_c = theta_c(3);
+b0_c = theta_c(4);
 
 disp("Model A")
 disp(theta_a)
@@ -67,19 +67,44 @@ disp("Model C")
 disp(theta_c)
 
 
-
-
-
+%%%%% PREDICTION PART %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 yn= yval;
 un = uval;
+val_len = ceil(length(u)*0.2);
 
-ypred = zeros(len_data_div, 1);
-ypred(1) = yn(1);
+ypred_a = zeros(val_len, 1);
+ypred_a(1) = yn(1);
+ypred_a(2) = yn(2);
+ypred_b = zeros(val_len, 1);
+ypred_b(1) = yn(1);
+ypred_b(2) = yn(2);
+ypred_c = zeros(val_len, 1);
+ypred_c(1) = yn(1);
+ypred_c(2) = yn(2);
+ypred_c(2) = yn(3);
 
-for i=3:len_data_div
-    ypred(i) = -a_1hat*yest(i-1) -a_2hat*yest(i-2) + b_0hat*uest(i);
+for i=3:val_len
+    ypred_a(i) = -a1_a*yest(i-1) -a2_a*yest(i-2) + b0_a*uest(i);
+    ypred_b(i) = -a1_b*yest(t-1) -a2_b*yest(t-2) + b0_b*uest(t) + b1_b*uest(t-1);
 end
 
-predERROR = yn - ypred
-predRMSE = rms(predERROR)
+for i=4:val_len
+    ypred_c(i) = -a1_c*yest(t-1) -a2_c*yest(t-2) -a3_c*yest(t-3) + b0_c*uest(t-1);
+end
+
+predERROR_a = yn - ypred_a;
+predERROR_b = yn - ypred_b;
+predERROR_c = yn - ypred_c;
+predRMSE_a = rms(predERROR_a);
+predRMSE_b = rms(predERROR_b);
+predRMSE_c = rms(predERROR_c);
+
+disp("Model A pred")
+disp(predRMSE_a)
+disp("Model B pred")
+disp(predRMSE_b)
+disp("Model C pred")
+disp(predRMSE_c)
+
+%%%SIMULATION PART %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
