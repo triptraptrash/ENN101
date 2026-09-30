@@ -1,133 +1,85 @@
 clc
 load("input.mat")
 load("output.mat")
-syms a_1 a_2 b_0 const
-%80 validation 20% training
-split_u = floor(0.8*length(u));
-test_data_u = u(split_u+1:end, 1);
-train_row_u = u(1: split_u, 1);
 
-split_y = floor(0.8*length(y));
-test_data_y = y(split_y+1:end, 1);
-train_row_y = y(1: split_y, 1);
+len_data_div = floor(length(u)*0.8);
+uest = u(1:len_data_div);
+yest = y(1:len_data_div);
 
-len_group = floor(length(train_row_y)/5);
-y_groups = zeros(len_group, 5);
-u_groups = zeros(len_group, 5);
-c = 0;
-while c < 5
-    u_groups(:, c+1) = train_row_u(c*len_group+1:(c+1)*len_group);
-    y_groups(:, c+1) = train_row_y(c*len_group+1:(c+1)*len_group);
-    c= c+1;
-end
-a_2 = 1;
-a_1 = 1;
-b_0 = 1;
-y_hat_est = zeros(len_group, 5);
-for iter = 1:5   
-    for t = 3:len_group % zero initial condition
-        phi = [-y_groups(t-1, iter) -y_groups(t-2, iter) u_groups(t, iter)].';
-        theta = [a_1 a_2 b_0];
-        y_hat_est(t, iter) = theta*phi;
-    end
-   
-end
+uval = u(len_data_div+1:end);
+yval = y(len_data_div+1:end);
 
-%%% estimation part
-for iter = 1:5
-    H(iter, :) = [yest(iter-1) u_groups(iter-1)];
+%%estimation part
+N_est = length(yest);
+H_a = zeros(N_est, 3);
+Y_a = yest;
+H_b = zeros(N_est, 4);
+Y_b = yest;
+H_c = zeros(N_est, 4);
+Y_c = yest;
+
+H_a(1, :) = [0 0 0];
+H_a(2, :) = [0 0 0];
+
+H_b(1, :) = [0 0 0 0];
+H_b(2, :) = [0 0 0 0];
+
+H_c(1, :) = [0 0 0 0];
+H_c(2, :) = [0 0 0 0];
+
+for t = 3:N_est
+    H_a(t, :) = [-yest(t-1) -yest(t-2) uest(t)];
+    H_b(t, :) = [-yest(t-1) -yest(t-2) uest(t) uest(t-1)];
 end
 
-th = (H.'*H)\H.'*y_hat
-
-%while iteration
-%Make a while loop and least square it
-% phi = [ones(N,1) u_groups(iteration)] ;
-% theta_hat = phi\yn;
-% y_hat = phi * theta_hat;
-
-%Get the good stuff and change the estimator param
-%Look through our groups that are not in the iteration
-%Get the error
-%Go to the next iteration
-
-%
-
-
-
-
-% figure(1); clf;
-% plot(x, yn, '.');
-% hold on;
-% plot(x, y_hat_lin);
-% hold off;
-% legend('data', 'estimate')
-% title('Linear Estimation')
-% xlabel('x')
-% ylabel('y')
-clc
-load("input.mat")
-load("output.mat")
-syms a_1 a_2 b_0 const
-%80 validation 20% training
-split_u = floor(0.8*length(u));
-test_data_u = u(split_u+1:end, 1);
-train_row_u = u(1: split_u, 1);
-
-split_y = floor(0.8*length(y));
-test_data_y = y(split_y+1:end, 1);
-train_row_y = y(1: split_y, 1);
-
-len_group = floor(length(train_row_y)/5);
-y_groups = zeros(len_group, 5);
-u_groups = zeros(len_group, 5);
-c = 0;
-while c < 5
-    u_groups(:, c+1) = train_row_u(c*len_group+1:(c+1)*len_group);
-    y_groups(:, c+1) = train_row_y(c*len_group+1:(c+1)*len_group);
-    c= c+1;
-end
-y_hat_est = zeros(len_group, 5);
-u_est = u_groups;
-
-for iter = 1:5
-    
-    for t = 3:len_group-2 % zero initial condition
-        phi = [-y(t-1, iter) -y(t-2, iter) u_groups(t, iter)].';
-        theta = [a_1 a_2 b_0];
-        y_hat_est(t) = theta*phi;
-    end
-   
+for t = 4:N_est
+    H_c(t, :) = [-yest(t-1) -yest(t-2) -yest(t-3) uest(t-1)];
 end
 
-%%% estimation part
-for iter = 1:5
-    H(iter, :)
+%Model a)
+theta_a = H_a\yest;
+
+a_1_a = theta_a(1);
+a_2_a = theta_a(2);
+b_0_a = theta_a(3);
+
+%model b)
+theta_b = H_b\yest;
+
+a1_b = theta_b(1);
+a2_b = theta_b(2);
+b0_b = theta_b(3);
+b1_b = theta_b(4);
+
+%model c)
+theta_c = H_c\yest;
+
+a1_c = theta_c(1);
+a2_c = theta_c(2);
+b0_c = theta_c(3);
+b1_c = theta_c(4);
+
+disp("Model A")
+disp(theta_a)
+disp("Model B")
+disp(theta_b)
+disp("Model C")
+disp(theta_c)
+
+
+
+
+
+yn= yval;
+un = uval;
+
+ypred = zeros(len_data_div, 1);
+ypred(1) = yn(1);
+
+for i=3:len_data_div
+    ypred(i) = -a_1hat*yest(i-1) -a_2hat*yest(i-2) + b_0hat*uest(i);
 end
-%Let them find things, get the estimator
 
-%while iteration
-%Make a while loop and least square it
-% phi = [ones(N,1) u_groups(iteration)] ;
-% theta_hat = phi\yn;
-% y_hat = phi * theta_hat;
+predERROR = yn - ypred
+predRMSE = rms(predERROR)
 
-%Get the good stuff and change the estimator param
-%Look through our groups that are not in the iteration
-%Get the error
-%Go to the next iteration
-
-%
-
-
-
-
-% figure(1); clf;
-% plot(x, yn, '.');
-% hold on;
-% plot(x, y_hat_lin);
-% hold off;
-% legend('data', 'estimate')
-% title('Linear Estimation')
-% xlabel('x')
-% ylabel('y')
