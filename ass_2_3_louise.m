@@ -56,7 +56,7 @@ theta_c = H_c\yest;
 
 a1_c = theta_c(1);
 a2_c = theta_c(2);
-b0_c = theta_c(3);
+a3_c = theta_c(3);
 b1_c = theta_c(4);
 
 disp("Model A")
@@ -121,7 +121,7 @@ y_sim_b(2) = yval(2);
 
 for i=3:length(yval)
     y_sim_a(i) = b0_a*uval(i) -a1_a*y_sim_a(i-1) -a2_a*y_sim_a(i-2);
-    y_sim_b(i) = b0_b*uval(i) + b1_b*uval(i-1) -a1_b*y_sim_a(i-1) -a2_b*y_sim_a(i-2);
+    y_sim_b(i) = b0_b*uval(i) + b1_b*uval(i-1) -a1_b*y_sim_b(i-1) -a2_b*y_sim_b(i-2);
 end
 
 y_sim_c = zeros(length(yval),1);
@@ -155,7 +155,7 @@ xlabel('Samples')
 ylabel('output')
 subplot(2,1,2)
 plot(simERROR_a)
-legend('Prediction error')
+legend('Simulation Prediction error')
 xlabel('Samples')
 ylabel('error')
  
