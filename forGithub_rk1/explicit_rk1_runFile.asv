@@ -1,0 +1,23 @@
+clc
+lambda = -2;
+delta_t = 1e-1;
+x_0 = 1;
+t_f = 2;
+
+x = 0:delta_t:t_f;
+
+f = lambda*x; 
+
+rk1_butcherTable = 1; %b1 = 1
+saved_x_k1 = zeros(length(x));
+
+
+[x_dot, k1, x_k1] = rk1_func(f, rk1_butcherTable, x_0, delta_t);
+x_0 = x_k1;
+
+figure(1)
+plot(x_k1, x);
+hold('on')
+plot(f,x);
+grid('on')
+hold('off')
