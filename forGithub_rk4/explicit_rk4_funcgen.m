@@ -16,6 +16,6 @@ k4 = lamda.*(x_prev + a3.*delta_t.*k3);
 
 x_k1 = x_prev + delta_t.*(b1.*k1 + b2.*k2 + b3.*k3 + b4.*k4);
 
-matlabFunction(x_dot, k1, x_k1, 'File', 'rk4_func', 'Vars', {lamda, rk4_butcherTable, x_prev, delta_t})
+matlabFunction(x_k1, 'File', 'rk4_func', 'Vars', {lamda, rk4_butcherTable, x_prev, delta_t})
 
 
