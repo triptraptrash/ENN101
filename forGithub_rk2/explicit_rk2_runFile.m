@@ -11,7 +11,7 @@ saved_x_k2 = zeros(1,length(x));
 saved_x_k2(1) = x_0;
 
 for i = 2:(length(x))
-    [~, x_k2] = rk2_func(lambda, rk2_butcherTable(1),  rk2_butcherTable(2),  rk2_butcherTable(3), x_0, delta_t);
+    x_k2 = rk2_func(lambda, rk2_butcherTable(1),  rk2_butcherTable(2),  rk2_butcherTable(3), x_0, delta_t);
     saved_x_k2(i) = x_k2;
     x_0 = x_k2;
 
