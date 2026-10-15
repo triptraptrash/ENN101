@@ -9,6 +9,6 @@ k1 = x_dot;
 k2 =lamda.*(x_prev + a.*delta_t.*k1); %is this correct?
 x_k1 = x_prev + delta_t.*(b1.*k1 + b2.*k2);
 
-matlabFunction(x_dot, k1, x_k1, 'File', 'rk2_func', 'Vars', {lamda, a, b1, b2, x_prev, delta_t})
+matlabFunction(x_k1, 'File', 'rk2_func', 'Vars', {lamda, a, b1, b2, x_prev, delta_t})
 
 
