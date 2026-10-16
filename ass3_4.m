@@ -14,15 +14,15 @@ k1 = 1;
 k2 =3;
 
 alpha = 1;
-dt = 0.01;
-t = 0:dt:50;
+dt = 0.1;
+t = 0:dt:1;
 
 N = length(t) - 1;
 
 
 x = zeros(1, length(t));
 x(1) =1;
-lamda = -1;
+lamda = -28;
 
 
 for i = 1:N
@@ -41,11 +41,21 @@ for i = 1:N
     x(i+1) = x(i) + dt*(b*K);
 end
 
+
+%% old rk4 from exercise 2
+
+x_rk4 = old_rk4(lamda)';
+
+
 x_exact = exp(lamda*t)*x(1); %since solution to the autonomous system
 
+
 figure(1)
-plot(t, x, 'b-', t, x_exact, 'r--')
-legend('IRK numerical solution', 'Exact solution')
+plot(t, x, 'b-');
+hold on
+plot(t, x_exact, 'r--')
+plot(t,x_rk4,'*')
+legend('IRK numerical solution', 'Exact solution', 'old RK4')
 xlabel('Time t')
 ylabel('x(t)')
 grid on
